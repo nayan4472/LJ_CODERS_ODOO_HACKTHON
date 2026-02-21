@@ -51,7 +51,7 @@ Follow these steps to launch the entire ecosystem:
 ```bash
 cd api-gateway
 npm install
-node index.js
+npm start
 ```
 
 ### 2️⃣ Launch Microservices
@@ -60,7 +60,7 @@ Open a separate terminal for each:
 # Services: auth, fleet, trip, realtime, analytics
 cd backend-services/[service-name]
 npm install
-node index.js
+npm start
 ```
 
 ### 3️⃣ Start the Dashboard

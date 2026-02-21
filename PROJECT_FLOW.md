@@ -72,14 +72,14 @@ You will need to open **multiple terminal windows** (one for each service).
 2.  **API Gateway**:
     ```bash
     cd api-gateway
-    node index.js
+    npm start
     ```
 3.  **Microservices**: (Open 5 separate terminals)
-    - `cd backend-services/auth-service && node index.js`
-    - `cd backend-services/fleet-service && node index.js`
-    - `cd backend-services/trip-service && node index.js`
-    - `cd backend-services/realtime-service && node index.js`
-    - `cd backend-services/analytics-service && node index.js`
+    - `cd backend-services/auth-service && npm start`
+    - `cd backend-services/fleet-service && npm start`
+    - `cd backend-services/trip-service && npm start`
+    - `cd backend-services/realtime-service && npm start`
+    - `cd backend-services/analytics-service && npm start`
 4.  **Frontend**:
     ```bash
     cd frontend
