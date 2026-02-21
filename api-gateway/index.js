@@ -11,17 +11,19 @@ app.use(cors());
 // Define routes for proxying to microservices
 const services = {
     '/api/v1/auth': 'http://localhost:5001',
-    '/api/v1/vehicles': 'http://localhost:5002',
+    '/api/v1/fleet': 'http://localhost:5002',
     '/api/v1/trips': 'http://localhost:5003',
     '/api/v1/analytics': 'http://localhost:5005',
 };
 
-// Apply proxy middleware
 Object.entries(services).forEach(([route, target]) => {
     app.use(route, createProxyMiddleware({
         target,
         changeOrigin: true,
-        logLevel: 'debug'
+        logLevel: 'debug',
+        pathRewrite: {
+            [`^${route}`]: '',
+        },
     }));
 });
 

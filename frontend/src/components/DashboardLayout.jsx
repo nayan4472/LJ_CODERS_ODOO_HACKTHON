@@ -1,12 +1,16 @@
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { Truck, LayoutDashboard, Database, Map as MapIcon, Wrench, FileText, Users, LogOut, Bell } from 'lucide-react';
+import { Truck, LayoutDashboard, Database, Map as MapIcon, Wrench, FileText, Users, LogOut, Bell, DollarSign } from 'lucide-react';
 import { logout } from '../services/auth.service';
 
 const SidebarLink = ({ to, icon: Icon, label }) => (
     <NavLink to={to} className={({ isActive }) => `flex items-center px-4 py-3.5 mb-2 rounded-xl transition-all duration-300 group ${isActive ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20 shadow-[0_0_15px_rgba(100,255,218,0.05)]' : 'text-slate-400 hover:bg-navy-700/50 hover:text-slate-200 border border-transparent'}`}>
-        <Icon className={`h-5 w-5 mr-3 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-500/70'}`} />
-        <span className="font-semibold tracking-wide text-sm">{label}</span>
+        {({ isActive }) => (
+            <>
+                <Icon className={`h-5 w-5 mr-3 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-500/70'}`} />
+                <span className="font-semibold tracking-wide text-sm">{label}</span>
+            </>
+        )}
     </NavLink>
 );
 
@@ -41,6 +45,7 @@ const DashboardLayout = () => {
                     <SidebarLink to="/maintenance" icon={Wrench} label="Advanced Insights" />
                     <SidebarLink to="/drivers" icon={Users} label="Personnel Hub" />
                     <SidebarLink to="/analytics" icon={FileText} label="ROI & Analytics" />
+                    <SidebarLink to="/expenses" icon={DollarSign} label="Expense Logging" />
                 </nav>
 
                 <div className="p-4 border-t border-navy-700/50 bg-navy-900/20">

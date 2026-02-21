@@ -16,29 +16,38 @@ const LiveMap = () => {
         pitch: 45
     });
 
-    const [vehicles, setVehicles] = useState({
-        'V-001': { id: 'V-001', lat: 40.7128, lng: -74.006, speed: 45, status: 'On Trip', health: 98 },
-        'V-002': { id: 'V-002', lat: 40.7300, lng: -73.990, speed: 60, status: 'On Trip', health: 94 }
-    });
+    const [vehicles, setVehicles] = useState({});
+
+    const user = JSON.parse(localStorage.getItem('fleetflow_user') || '{}');
 
     useEffect(() => {
         const socket = io(SOCKET_URL);
-        // ... (rest of useEffect simulation logic)
-        const interval = setInterval(() => {
-            setVehicles(prev => {
-                const updated = { ...prev };
-                Object.values(updated).forEach(v => {
-                    updated[v.id] = {
-                        ...v,
-                        lat: v.lat + (Math.random() - 0.5) * 0.005,
-                        lng: v.lng + (Math.random() - 0.5) * 0.005,
-                    };
-                });
-                return updated;
-            });
-        }, 3000);
-        return () => { socket.disconnect(); clearInterval(interval); };
-    }, []);
+
+        socket.on('connect', () => {
+            console.log('🔗 Connected to Neural Uplink');
+            socket.emit('join_company_room', user.companyId);
+        });
+
+        socket.on('map_update', (data) => {
+            // Payload: { companyId, vehicleId, lat, lng, speed, status }
+            setVehicles(prev => ({
+                ...prev,
+                [data.vehicleId]: {
+                    id: data.vehicleId,
+                    lat: data.lat,
+                    lng: data.lng,
+                    speed: data.speed,
+                    status: data.status,
+                    health: prev[data.vehicleId]?.health || 100
+                }
+            }));
+        });
+
+        return () => {
+            socket.disconnect();
+            console.log('🔴 Uplink Terminated');
+        };
+    }, [user.companyId]);
 
     return (
         <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-1000">
@@ -130,7 +139,7 @@ const LiveMap = () => {
                     <div className="bg-navy-950/80 backdrop-blur-2xl px-8 py-3 rounded-full border border-navy-700/50 shadow-2xl flex items-center space-x-8">
                         <div className="text-center">
                             <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Active Fleet</p>
-                            <p className="text-sm font-display font-black text-white">422</p>
+                            <p className="text-sm font-display font-black text-white">{Object.keys(vehicles).length || 0}</p>
                         </div>
                         <div className="h-6 w-px bg-navy-700"></div>
                         <div className="text-center">

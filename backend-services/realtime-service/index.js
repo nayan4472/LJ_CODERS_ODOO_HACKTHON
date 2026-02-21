@@ -17,22 +17,21 @@ app.use(cors());
 app.get('/health', (req, res) => res.status(200).json({ status: 'Real-time service is running' }));
 
 io.on('connection', (socket) => {
-    console.log(`⚡ Client connected: ${socket.id}`);
+    console.log(`⚡ Quantum Uplink Established: ${socket.id}`);
 
     socket.on('join_company_room', (companyId) => {
         socket.join(companyId);
-        console.log(`User ${socket.id} joined room ${companyId}`);
+        console.log(`📡 Identity ${socket.id} synchronized with Cluster ${companyId}`);
     });
 
     socket.on('vehicle_location_update', (data) => {
-        // Broadcast location update to the specific company room
-        // Payload: { companyId, vehicleId, lat, lng, speed }
+        // Payload: { companyId, vehicleId, lat, lng, speed, status }
         io.to(data.companyId).emit('map_update', data);
-        console.log(`📡 Broadcasted location for ${data.vehicleId}`);
+        console.log(`🛰️ Position Broadcast: Asset ${data.vehicleId} -> Cluster ${data.companyId}`);
     });
 
     socket.on('disconnect', () => {
-        console.log(`🔴 Client disconnected: ${socket.id}`);
+        console.log(`🔴 Uplink Terminated: ${socket.id}`);
     });
 });
 

@@ -3,7 +3,8 @@ const router = express.Router();
 const authController = require('../controllers/auth.controller');
 
 router.post('/login', authController.login);
-router.post('/register', authController.register); // mainly for setup
+router.post('/register', authController.register);
+router.post('/verify-registration', authController.verifyRegistration);
 
 // Password Reset Flow
 router.post('/password/forgot', authController.forgotPassword);

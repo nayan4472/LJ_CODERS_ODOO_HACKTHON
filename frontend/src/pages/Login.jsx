@@ -1,25 +1,53 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { login, forgotPassword, verifyOtp, resetPassword } from '../services/auth.service';
-import { Truck, Lock, Mail, Key } from 'lucide-react';
+import { Truck, Lock, Mail, Key, Briefcase } from 'lucide-react';
+
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Login = () => {
     const [view, setView] = useState('login'); // login, forgot, otp, reset
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [role, setRole] = useState('Manager');
     const [otp, setOtp] = useState('');
     const [error, setError] = useState('');
     const [msg, setMsg] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
         try {
             const data = await login(email, password);
-            if (data.token) navigate('/dashboard');
+            if (data.token) {
+                // Store user info and token
+                localStorage.setItem('fleetflow_token', data.token);
+                localStorage.setItem('fleetflow_user', JSON.stringify(data.user));
+
+                // Validation: Ensure current role selection matches account role
+                if (data.user.role !== role) {
+                    setError(`Permission Denied: Your account is registered as ${data.user.role}. Please select the correct role.`);
+                    localStorage.removeItem('fleetflow_token');
+                    localStorage.removeItem('fleetflow_user');
+                    return;
+                }
+
+                // Role-Based Redirection
+                const dashMap = {
+                    'Manager': '/dashboard',
+                    'Dispatcher': '/dispatch',
+                    'Safety_Officer': '/drivers',
+                    'Financial_Analyst': '/analytics'
+                };
+                navigate(dashMap[role] || '/dashboard');
+            }
         } catch (err) {
-            setError(err.response?.data?.error || 'Login failed. Note: you must register first in a real DB.');
+            setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -99,12 +127,34 @@ const Login = () => {
                                         <input type="password" required className="input-field pl-10" value={password} onChange={(e) => setPassword(e.target.value)} />
                                     </div>
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-2">Login View</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Briefcase className="h-5 w-5 text-slate-500" />
+                                        </div>
+                                        <select
+                                            name="role"
+                                            value={role}
+                                            onChange={(e) => setRole(e.target.value)}
+                                            className="input-field pl-10 appearance-none cursor-pointer hover:border-teal-500/50 transition-colors"
+                                        >
+                                            <option value="Manager" className="bg-navy-900 text-white">Fleet Manager</option>
+                                            <option value="Dispatcher" className="bg-navy-900 text-white">Dispatcher</option>
+                                            <option value="Safety_Officer" className="bg-navy-900 text-white">Safety Officer</option>
+                                            <option value="Financial_Analyst" className="bg-navy-900 text-white">Financial Analyst</option>
+                                        </select>
+                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <div className="h-4 w-4 border-r-2 border-b-2 border-slate-500 rotate-45 mb-1 mr-1"></div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="flex items-center justify-between">
                                     <div className="text-sm">
                                         <button type="button" onClick={() => setView('forgot')} className="font-medium text-teal-500 hover:text-teal-400">Forgot your password?</button>
                                     </div>
                                 </div>
-                                <div><button type="submit" className="w-full btn-primary flex justify-center">Sign in</button></div>
+                                <div><button type="submit" disabled={loading} className="w-full btn-primary flex justify-center">{loading ? 'Synchronizing...' : 'Sign in'}</button></div>
                                 <div className="text-center mt-4 text-sm text-slate-400">
                                     Don't have an account?{' '}
                                     <Link to="/register" className="font-medium text-teal-500 hover:text-teal-400">

@@ -16,18 +16,19 @@ Ensure you have the following running in separate terminals:
 ## 📝 Step 1: Register a Test User
 Since the UI currently focuses on Login, you must register a test user first using **Postman** or **cURL**.
 
-### Use this cURL command:
+### Use this cURL command (via Gateway):
 ```bash
-curl -X POST http://localhost:5001/register \
+curl -X POST http://localhost:5000/api/v1/auth/register \
 -H "Content-Type: application/json" \
 -d '{
   "name": "Test Admin",
   "email": "test@example.com",
   "password": "password123",
-  "role": "admin",
+  "role": "Manager",
   "companyId": "FLEET_001"
 }'
 ```
+
 
 ---
 

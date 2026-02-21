@@ -10,10 +10,17 @@ import Analytics from './pages/Analytics';
 import LiveMap from './pages/LiveMap';
 import Maintenance from './pages/Maintenance';
 import Drivers from './pages/Drivers';
+import ExpenseLogging from './pages/ExpenseLogging';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const token = localStorage.getItem('fleetflow_token');
-  // if (!token) return <Navigate to="/login" replace />; // disabled for hackathon ease of demo
+  const user = JSON.parse(localStorage.getItem('fleetflow_user') || '{}');
+
+  if (!token) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return children;
 };
 
@@ -26,14 +33,37 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<CommandCenter />} />
-            <Route path="/map" element={<LiveMap />} />
-            <Route path="/vehicles" element={<VehicleRegistry />} />
-            <Route path="/dispatch" element={<TripDispatcher />} />
-            <Route path="/maintenance" element={<Maintenance />} />
-            <Route path="/drivers" element={<Drivers />} />
-            <Route path="/analytics" element={<Analytics />} />
+          <Route element={<DashboardLayout />}>
+            {/* Common Routes */}
+            <Route path="/dashboard" element={<ProtectedRoute><CommandCenter /></ProtectedRoute>} />
+            <Route path="/map" element={<ProtectedRoute><LiveMap /></ProtectedRoute>} />
+            <Route path="/vehicles" element={<ProtectedRoute><VehicleRegistry /></ProtectedRoute>} />
+            <Route path="/drivers" element={<ProtectedRoute><Drivers /></ProtectedRoute>} />
+
+            {/* Role-Specific Routes */}
+            <Route path="/dispatch" element={
+              <ProtectedRoute allowedRoles={['Manager', 'Dispatcher']}>
+                <TripDispatcher />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/maintenance" element={
+              <ProtectedRoute allowedRoles={['Manager', 'Dispatcher']}>
+                <Maintenance />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/analytics" element={
+              <ProtectedRoute allowedRoles={['Manager', 'Financial_Analyst']}>
+                <Analytics />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/expenses" element={
+              <ProtectedRoute allowedRoles={['Manager', 'Financial_Analyst']}>
+                <ExpenseLogging />
+              </ProtectedRoute>
+            } />
           </Route>
         </Routes>
       </div>
