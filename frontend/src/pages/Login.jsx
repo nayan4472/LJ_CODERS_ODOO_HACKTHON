@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { login, forgotPassword, verifyOtp, resetPassword } from '../services/auth.service';
 import { Truck, Lock, Mail, Key } from 'lucide-react';
 
@@ -105,6 +105,12 @@ const Login = () => {
                                     </div>
                                 </div>
                                 <div><button type="submit" className="w-full btn-primary flex justify-center">Sign in</button></div>
+                                <div className="text-center mt-4 text-sm text-slate-400">
+                                    Don't have an account?{' '}
+                                    <Link to="/register" className="font-medium text-teal-500 hover:text-teal-400">
+                                        Create one now
+                                    </Link>
+                                </div>
                             </form>
                         )}
 

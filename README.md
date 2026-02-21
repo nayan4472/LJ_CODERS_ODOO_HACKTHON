@@ -54,6 +54,9 @@ npm install
 npm start
 ```
 
+#database  : MONGO_URI=mongodb+srv://yashkharva506:Sufalam%402233@cluster0.j6nogwi.mongodb.net/fleetflow?retryWrites=true&w=majority&appName=Cluster0
+
+
 ### 2️⃣ Launch Microservices
 Open a separate terminal for each:
 ```bash
